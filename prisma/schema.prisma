@@ -19,10 +19,11 @@ model User {
   emailVerified  DateTime?
   image          String?
   sessions       Session[]
-  accounts       Account[] 
+  accounts       Account[]
   authenticators Authenticator[]
   posts          Post[]          @relation("UserPosts")
   comments       Comment[]       @relation("UserComments")
+  likes          Like[]          @relation("UserLikes")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,10 +93,12 @@ model Post {
   title     String
   content   String
   authorId  String
+  image     String?
   author    User      @relation("UserPosts", fields: [authorId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Comment   Comment[]
+  comments  Comment[]
+  likes     Like[]    @relation("PostLikes")
 }
 
 model Comment {
@@ -107,6 +110,15 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  user      User     @relation("UserLikes", fields: [userId], references: [id])
+  post      Post     @relation("PostLikes", fields: [postId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 enum Role {
