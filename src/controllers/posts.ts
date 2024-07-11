@@ -1,10 +1,17 @@
 import { Request, Response } from "express"
 import prisma from "../../lib/db"
+import { number, string } from "zod";
 
+interface Post {
+    content: string,
+    authorId: string,
+    image: string,
+}
 
 export const createPost = async (req: Request, res: Response) => {
-    const { title, content, authorId, image } = req.body
     try {
+        const { content, authorId, image }: Post = req.body
+        console.log({ content, authorId, image });
         const user = await prisma.user.findUnique({
             where: { id: authorId }
         })
@@ -13,7 +20,6 @@ export const createPost = async (req: Request, res: Response) => {
         }
         const post = await prisma.post.create({
             data: {
-                title,
                 content,
                 authorId,
                 image: image || ""
@@ -32,21 +38,23 @@ export const createPost = async (req: Request, res: Response) => {
     }
 }
 export const updetePost = async (req: Request, res: Response) => {
-    const { title, content, image } = req.body
-    const idPost = req.query.id as string;
     try {
-        const post = await prisma.post.update({
+        const { content, image } = req.body
+        const idPost = req.query.id as string;
+        const post = await prisma.post.findUnique({
+            where: { id: idPost }
+        })
+        const newPost = await prisma.post.update({
             where: { id: idPost },
             data: {
-                title,
-                content,
-                image: image || ""
+                content: content || post?.content,
+                image: image || post?.image
             }
         })
-        if (!post) {
+        if (!newPost) {
             return res.status(400).json({ ok: false, message: "Post not updated" })
         }
-        return res.status(201).json({ ok: true, message: "Post updated", post })
+        return res.status(201).json({ ok: true, message: "Post updated", newPost })
     } catch (error) {
         return res.status(500).json({
             ok: false,
@@ -56,8 +64,8 @@ export const updetePost = async (req: Request, res: Response) => {
     }
 }
 export const deletePost = async (req: Request, res: Response) => {
-    const idPost = req.query.id as string;
     try {
+        const idPost = req.query.id as string;
         const isexistePost = await prisma.post.findUnique({
             where: { id: idPost }
         })
@@ -80,13 +88,13 @@ export const deletePost = async (req: Request, res: Response) => {
     }
 }
 export const getPost = async (req: Request, res: Response) => {
-    const idPost = req.query.id as string;
     try {
+        const idPost = req.query.id as string;
         const post = await prisma.post.findUnique({
             where: { id: idPost },
             include: {
-                comments: true,
-                likes: true,
+                comment: true,
+                like: true,
             }
         });
         if (!post) {
@@ -96,8 +104,8 @@ export const getPost = async (req: Request, res: Response) => {
             ok: true,
             message: "Post found",
             post,
-            countOfLikes: post.likes.length,
-            countOfComments: post.comments.length,
+            countOfLikes: post.like.length,
+            countOfComments: post.comment.length,
         })
     } catch (error) {
         return res.status(500).json({
@@ -108,14 +116,14 @@ export const getPost = async (req: Request, res: Response) => {
     }
 }
 export const allPosts = async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const skip = (page - 1) * limit;
     try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const skip = (page - 1) * limit;
         const posts = await prisma.post.findMany({
             include: {
-                comments: true,
-                likes: true,
+                comment: true,
+                like: true,
             },
             skip,
             take: limit,
@@ -141,15 +149,72 @@ export const allPosts = async (req: Request, res: Response) => {
 
 
 export const myPosts = async (req: Request, res: Response) => {
-    const idUser = req.query.id as string;
     try {
+        const idUser = req.query.id as string;
         const posts = await prisma.post.findMany({
-            where: { authorId: idUser }
+            where: { authorId: idUser },
+            include: {
+                user: true,
+                comment: true,
+                like: true,
+                _count: {
+                    select: {
+                        comment: true,
+                        like: true,
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' },
         })
         if (posts.length <= 0) {
             return res.status(404).json({ ok: false, message: "No posts found" })
         }
-        return res.status(200).json({ ok: true, message: "Posts found", posts })
+
+        return res.status(200).json({
+            ok: true,
+            message: "Posts found",
+            posts,
+            countOfPosts: posts.length,
+        })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: "Internal Server Error",
+            error,
+        });
+    }
+}
+
+export const ToogleLike = async (req: Request, res: Response) => {
+    try {
+        const { postId, userId }: { postId: string, userId: string } = req.body;
+        const existingLike = await prisma.like.findFirst({
+            where: {
+                AND: [
+                    { postId: postId },
+                    { userId: userId }
+                ]
+            },
+        });
+
+        if (existingLike) {
+            await prisma.like.delete({
+                where: {
+                    id: existingLike.id,
+                },
+            });
+
+            return res.status(200).json({ liked: false });
+        } else {
+            await prisma.like.create({
+                data: {
+                    userId,
+                    postId,
+                },
+            });
+
+            return res.status(200).json({ liked: true });
+        }
     } catch (error) {
         return res.status(500).json({
             ok: false,
