@@ -93,9 +93,16 @@ export const getPost = async (req: Request, res: Response) => {
         const post = await prisma.post.findUnique({
             where: { id: idPost },
             include: {
+                user: true,
                 comment: true,
                 like: true,
-            }
+                _count: {
+                    select: {
+                        comment: true,
+                        like: true,
+                    }
+                }
+            },
         });
         if (!post) {
             return res.status(400).json({ ok: false, message: "Post not found" })
@@ -103,7 +110,7 @@ export const getPost = async (req: Request, res: Response) => {
         return res.status(201).json({
             ok: true,
             message: "Post found",
-            post,
+            posts:post,
             countOfLikes: post.like.length,
             countOfComments: post.comment.length,
         })
@@ -122,8 +129,15 @@ export const allPosts = async (req: Request, res: Response) => {
         const skip = (page - 1) * limit;
         const posts = await prisma.post.findMany({
             include: {
+                user: true,
                 comment: true,
                 like: true,
+                _count: {
+                    select: {
+                        comment: true,
+                        like: true,
+                    }
+                }
             },
             skip,
             take: limit,
