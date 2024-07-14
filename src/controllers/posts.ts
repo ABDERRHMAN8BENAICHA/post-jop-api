@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 import prisma from "../../lib/db"
-import { number, string } from "zod";
 
 interface Post {
     content: string,
