@@ -27,7 +27,7 @@ export const getComment = async (req: Request, res: Response) => {
             }
         })
         if (comments.length <= 0) {
-            return res.status(404).json({ ok: false, message: "No comments found" , comments :[] })
+            return res.status(404).json({ ok: false, message: "No comments found", comments: [] })
         }
         return res.status(200).json({ ok: true, comments, message: "Comments found" })
     } catch (error) {
@@ -41,6 +41,15 @@ export const getComment = async (req: Request, res: Response) => {
 export const getThisComment = async (req: Request, res: Response) => {
     const commentId = req.query.id as string;
     try {
+        const comment = await prisma.comment.findUnique({
+            where: {
+                id: commentId
+            }
+        })
+        if (!comment) {
+            return res.status(404).json({ ok: false, message: "Comment not found" })
+        }
+        return res.status(200).json({ ok: true, comment, message: "Comment found" })
     } catch (error) {
         return res.status(500).json({
             ok: false,

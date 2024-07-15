@@ -86,6 +86,7 @@ export const deletePost = async (req: Request, res: Response) => {
         })
     }
 }
+
 export const getPost = async (req: Request, res: Response) => {
     try {
         const idPost = req.query.id as string;
