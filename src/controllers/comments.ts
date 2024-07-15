@@ -9,6 +9,9 @@ export const getComment = async (req: Request, res: Response) => {
         const existePost = await prisma.post.findUnique({
             where: {
                 id: postId
+            },
+            include: {
+                user: true,
             }
         })
 
@@ -18,10 +21,13 @@ export const getComment = async (req: Request, res: Response) => {
         const comments = await prisma.comment.findMany({
             where: {
                 postId
+            },
+            include: {
+                user: true,
             }
         })
         if (comments.length <= 0) {
-            return res.status(404).json({ ok: false, message: "No comments found" })
+            return res.status(404).json({ ok: false, message: "No comments found" , comments :[] })
         }
         return res.status(200).json({ ok: true, comments, message: "Comments found" })
     } catch (error) {
@@ -74,6 +80,9 @@ export const createComment = async (req: Request, res: Response) => {
         const comments = await prisma.comment.findMany({
             where: {
                 postId
+            },
+            include: {
+                user: true,
             }
         })
         return res.status(201).json({ ok: true, message: "Comment created", comments, numberOfComments: comments.length })
@@ -114,6 +123,9 @@ export const updeteComment = async (req: Request, res: Response) => {
             where: {
                 postId: comment.postId
             },
+            include: {
+                user: true,
+            }
         })
         return res.status(200).json({ ok: true, message: "Comment updated", comments, numberOfComments: comments.length })
     } catch (error) {
@@ -149,6 +161,9 @@ export const deleteComment = async (req: Request, res: Response) => {
             where: {
                 postId: existeComment.postId
             },
+            include: {
+                user: true,
+            }
         })
         return res.status(200).json({ ok: true, message: "Comment deleted", comments, numberOfComments: comments.length })
     } catch (error) {
