@@ -76,3 +76,27 @@ export const isLiked = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const getLikes = async (req: Request, res: Response) => {
+    try {
+        const postId = req.query.id as string;
+        const likes = await prisma.like.findMany({
+            where: {
+                postId: postId
+            },
+            include: {
+                user: true,
+            }
+        })
+        if (likes.length <= 0) {
+            return res.status(200).json({ ok: true, likes: [] })
+        }
+        return res.status(200).json({ ok: true, likes: likes })
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            message: "Internal Server Error",
+            error,
+        });
+    }
+}
