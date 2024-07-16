@@ -9,6 +9,9 @@
   },
   "keywords": [],
   "author": "Ben aicha abderrhmane",
+  "engines": {
+    "node": "18.18.0"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
