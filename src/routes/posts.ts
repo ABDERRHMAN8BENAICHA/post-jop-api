@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost, updetePost, deletePost, getPost, allPosts, myPosts, ToogleLike } from "../controllers/posts";
+import { createPost, updetePost, deletePost, getPost, allPosts, myPosts} from "../controllers/posts";
 
 const postsRoutes: Router = Router();
 
@@ -9,6 +9,6 @@ postsRoutes.delete("/delete", deletePost)
 postsRoutes.get("/get", getPost)
 postsRoutes.get("/", allPosts)
 postsRoutes.get("/my-post", myPosts)
-postsRoutes.post("/toggle-like", ToogleLike)
+
 
 export default postsRoutes;
