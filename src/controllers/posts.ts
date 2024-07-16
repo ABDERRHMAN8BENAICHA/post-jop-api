@@ -71,6 +71,9 @@ export const deletePost = async (req: Request, res: Response) => {
         if (!isexistePost) {
             return res.status(400).json({ ok: false, message: "Post not found" })
         }
+        const deleteComments = await prisma.comment.deleteMany({
+            where: { postId: idPost },
+        })
         const post = await prisma.post.delete({
             where: { id: idPost }
         })
@@ -110,7 +113,7 @@ export const getPost = async (req: Request, res: Response) => {
         return res.status(201).json({
             ok: true,
             message: "Post found",
-            posts:post,
+            posts: post,
             countOfLikes: post.like.length,
             countOfComments: post.comment.length,
         })

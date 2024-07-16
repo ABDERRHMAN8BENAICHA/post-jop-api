@@ -43,6 +43,20 @@ model authenticator {
   @@id([userId, credentialID])
 }
 
+// model comment {
+//   id        String   @id @default(cuid())
+//   content   String
+//   authorId  String
+//   postId    String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   user      user     @relation(fields: [authorId], references: [id], map: "Comment_authorId_fkey")
+//   post      post     @relation(fields: [postId], references: [id], map: "Comment_postId_fkey")
+
+//   @@index([authorId], map: "Comment_authorId_fkey")
+//   @@index([postId], map: "Comment_postId_fkey")
+// }
+
 model comment {
   id        String   @id @default(cuid())
   content   String
@@ -51,7 +65,7 @@ model comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      user     @relation(fields: [authorId], references: [id], map: "Comment_authorId_fkey")
-  post      post     @relation(fields: [postId], references: [id], map: "Comment_postId_fkey")
+  post      post     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "Comment_postId_fkey")
 
   @@index([authorId], map: "Comment_authorId_fkey")
   @@index([postId], map: "Comment_postId_fkey")
@@ -67,8 +81,22 @@ model post {
   comment   comment[]
   like      like[]
   user      user      @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
+
   @@index([authorId], map: "Post_authorId_fkey")
 }
+
+// model post {
+//   id        String    @id @default(cuid())
+//   content   String
+//   authorId  String
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   image     String?
+//   comment   comment[] @relation(onDelete: Cascade)
+//   like      like[]
+//   user      user      @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
+//   @@index([authorId], map: "Post_authorId_fkey")
+// }
 
 model session {
   id           String   @id @default(cuid())
@@ -93,7 +121,7 @@ model user {
   updatedAt     DateTime        @updatedAt
   address       String?
   password      String?
-  phone         String?         
+  phone         String?
   role          user_role       @default(USER)
   account       account?
   authenticator authenticator[]
