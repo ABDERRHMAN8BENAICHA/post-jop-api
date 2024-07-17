@@ -74,6 +74,9 @@ export const deletePost = async (req: Request, res: Response) => {
         const deleteComments = await prisma.comment.deleteMany({
             where: { postId: idPost },
         })
+        const deleteLikes = await prisma.like.deleteMany({
+            where: { postId: idPost },
+        })
         const post = await prisma.post.delete({
             where: { id: idPost }
         })
