@@ -2,13 +2,19 @@
   "name": "srarter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx nodemon"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "startdev": "npx nodemon"
   },
   "keywords": [],
   "author": "Ben aicha abderrhmane",
+  "engines": {
+    "node": "18.18.0"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -23,6 +29,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.16.1",
+    "@vercel/node": "^3.2.3",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
