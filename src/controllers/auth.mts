@@ -4,7 +4,7 @@ import { hashSync, compareSync } from "bcrypt";
 
 
 export const signup = async (req: Request, res: Response) => {
-    const { name, username, email, password, phone, address ,image} = req.body;
+    const { name, username, email, password, phone, address, image } = req.body;
     try {
         const existeUser = await prisma.user.findUnique({
             where: {

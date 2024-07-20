@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getLikes, isLiked, ToggleLike } from "../controllers/likes";
+import { getLikes, isLiked, ToggleLike } from "../controllers/likes.mjs";
 
 const likesRoutes: Router = Router();
 

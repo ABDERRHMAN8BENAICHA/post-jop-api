@@ -1,6 +1,6 @@
 import express, { Response, Request, Express } from "express";
-import { PORT } from "./env";
-import rootRoutes from "./routes";
+import { PORT } from "./env.mjs";
+import rootRoutes from "./routes/index.mjs";
 import cors from "cors"
 
 const app: Express = express();

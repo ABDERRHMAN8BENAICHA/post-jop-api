@@ -1,8 +1,8 @@
 import { Router } from "express";
-import authRoutes from "./auth";
-import postsRoutes from "./posts";
-import commentsRoutes from "./comments";
-import likesRoutes from "./likes";
+import authRoutes from "./auth.mjs";
+import postsRoutes from "./posts.mjs";
+import commentsRoutes from "./comments.mjs";
+import likesRoutes from "./likes.mjs";
 
 
 const rootRoutes : Router= Router();
